@@ -8,47 +8,50 @@ from langchain.utilities import SearxSearchWrapper
 from config import Config
 
 CFG = Config()
-
-
+# 一般的なインターネット検索クエリに有用な関数
+# 複数の検索API（Tavily、Google SERP、Google API、Searx、DuckDuckGo）を使ってWeb検索を行う
 def web_search(query: str, num_results: int = 4) -> str:
     """Useful for general internet search queries."""
+     # 検索クエリを表示
     print("Searching with query {0}...".format(query))
+    # 検索結果を格納するリスト
     search_results = []
     search_response = []
+    # クエリが空の場合は空のJSONを返す
     if not query:
         return json.dumps(search_results)
-
+    # Tavily APIを使用する場合
     if CFG.search_api == "tavily":
         tavily_search = Client(os.environ["TAVILY_API_KEY"])
         results = tavily_search.search(query, search_depth="basic").get("results", [])
-        # Normalizing results to match the format of the other search APIs
+        # 結果を正規化
         search_response = [{"href": obj["url"], "body": obj["content"]} for obj in results]
-
+    # Google SERP APIを使用する場合
     elif CFG.search_api == "googleSerp":
         return serp_web_search(os.environ["SERP_API_KEY"], query, num_results)
-    
+    # Google APIを使用する場合
     elif CFG.search_api == "googleAPI":
         return google_web_search(os.environ["GOOGLE_API_KEY"], os.environ["GOOGLE_CX"], query, num_results)
-    
+    # Searx APIを使用する場合
     elif CFG.search_api == "searx":
         searx = SearxSearchWrapper(searx_host=os.environ["SEARX_URL"])
         results = searx.results(query, num_results)
-        # Normalizing results to match the format of the other search APIs
+    # 結果を正規化
         search_response = [{"href": obj["link"], "body": obj["snippet"]} for obj in results]
-
+    #duckduckgo検索
     elif CFG.search_api == "duckduckgo":
         ddgs = DDGS()
         search_response = ddgs.text(query)
-
+    # 結果をリストに追加
     total_added = 0
     for j in search_response:
         search_results.append(j)
         total_added += 1
         if total_added >= num_results:
             break
-
+    # JSON形式で結果を返す
     return json.dumps(search_results, ensure_ascii=False, indent=4)
-
+# Google SERP APIを使用して一般的なインターネット検索クエリに有用な関数
 def serp_web_search(serp_api_key:str, query: str, num_results: int = 10) -> str:
     """Useful for general internet search queries using the Serp API."""
     url = "https://google.serper.dev/search"
@@ -85,7 +88,7 @@ def serp_web_search(serp_api_key:str, query: str, num_results: int = 10) -> str:
     print("Searching with query {0}...".format(query))
     return json.dumps(search_results, ensure_ascii=False, indent=4)
 
-
+# Google APIを使用して一般的なインターネット検索クエリに有用な関数
 def google_web_search(google_api_key:str, google_cx:str, query: str, num_result: int = 10) -> str:
     """Useful for general internet search queries using the Google API."""
 
