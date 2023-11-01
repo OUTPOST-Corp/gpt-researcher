@@ -34,26 +34,26 @@ executor = ThreadPoolExecutor()
 FILE_DIR = Path(__file__).parent.parent
 CFG = Config()
 
-
+# 非同期でウェブサイトを閲覧し、ユーザーに答えとリンクを返す関数
 async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
-    """Browse a website and return the answer and links to the user
+    """ウェブサイトを閲覧し、ユーザーに答えとリンクを返す
 
-    Args:
-        url (str): The url of the website to browse
-        question (str): The question asked by the user
-        websocket (WebSocketManager): The websocket manager
+    引数
+        url (str): 閲覧するウェブサイトのURL
+        question (str): ユーザーからの質問
+        websocket (WebSocketManager): ウェブソケットマネージャ
 
-    Returns:
-        str: The answer and links to the user
+    戻り値
+        str: 答えとユーザーへのリンク
     """
     loop = asyncio.get_event_loop()
     executor = ThreadPoolExecutor(max_workers=8)
 
-    print(f"Scraping url {url} with question {question}")
+    print(f"{question}で {url}をスクレイピング中")
     await websocket.send_json(
         {
             "type": "logs",
-            "output": f"🔎 Browsing the {url} for relevant about: {question}...",
+            "output": f"🔎  {url} をブラウジングしています。 質問内容: {question}...",
         }
     )
 
@@ -80,18 +80,15 @@ async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
 
 
 def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
-    """Browse a website and return the answer and links to the user
-
+    """Seleniumを使用してウェブサイトからテキストをスクレイピングします。
     Args:
-        url (str): The url of the website to browse
-        question (str): The question asked by the user
-
+        url (str): スクレイピングするウェブサイトのURL
     Returns:
-        Tuple[str, WebDriver]: The answer and links to the user and the webdriver
+        Tuple[WebDriver, str]: WebDriverとウェブサイトからスクレイピングしたテキスト
     """
 
     if not url:
-        return "A URL was not specified, cancelling request to browse website.", None
+        return "URLが指定されていないため、ウェブサイト閲覧のリクエストをキャンセルした。", None
 
     driver, text = scrape_text_with_selenium(url)
     add_header(driver)
