@@ -91,18 +91,18 @@ class ResearchAgent:
         return answer
 
     async def create_search_queries(self):
-        """ Creates the search queries for the given question.
-        Args: None
-        Returns: list[str]: The search queries for the given question
+        """ 与えられた質問に対する検索クエリを作成します。
+        引数 なし
+        戻り値: リスト[str] 与えられた質問に対する検索クエリ
         """
         result = await self.call_agent(prompts.generate_search_queries_prompt(self.question))
         await self.stream_output(f"🧠 I will conduct my research based on the following queries: {result}...")
         return json.loads(result)
 
     async def async_search(self, query):
-        """ Runs the async search for the given query.
-        Args: query (str): The query to run the async search for
-        Returns: list[str]: The async search for the given query
+        """ 与えられたクエリに対して非同期検索を実行します。
+        引数: query (str): 非同期検索を実行するクエリ。
+        戻り値: list[str]: 与えられたクエリに対する非同期検索
         """
         search_results = json.loads(web_search(query))
         new_search_urls = self.get_new_urls([url.get("href") for url in search_results])
@@ -133,9 +133,9 @@ class ResearchAgent:
         return result
 
     async def conduct_research(self):
-        """ Conducts the research for the given question.
-        Args: None
-        Returns: str: The research for the given question
+        """ 与えられた質問に対して調査を行う。
+        引数 なし
+        戻り値: str: 与えられた質問に対するリサーチ
         """
         self.research_summary = read_txt_files(self.dir_path) if os.path.isdir(self.dir_path) else ""
 
@@ -151,9 +151,9 @@ class ResearchAgent:
 
 
     async def create_concepts(self):
-        """ Creates the concepts for the given question.
-        Args: None
-        Returns: list[str]: The concepts for the given question
+        """ 与えられた質問の概念を作成します。
+        引数 なし
+        戻り値: リスト[str] 与えられた質問の概念
         """
         result = self.call_agent(prompts.generate_concepts_prompt(self.question, self.research_summary))
 
@@ -161,9 +161,9 @@ class ResearchAgent:
         return json.loads(result)
 
     async def write_report(self, report_type, websocket=None):
-        """ Writes the report for the given question.
-        Args: None
-        Returns: str: The report for the given question
+        """ 与えられた質問に対するレポートを書き込みます。
+        引数 なし
+        戻り値: str: 与えられた質問のレポート
         """
         report_type_func = prompts.get_report_by_type(report_type)
         await self.stream_output(f"✍️ Writing {report_type} for research task: {self.question}...")
@@ -178,9 +178,9 @@ class ResearchAgent:
         return answer, path
 
     async def write_lessons(self):
-        """ Writes lessons on essential concepts of the research.
-        Args: None
-        Returns: None
+        """ 研究の本質的な概念に関するレッスンを書く。
+        引数 なし
+        戻り値 なし
         """
         concepts = await self.create_concepts()
         for concept in concepts:

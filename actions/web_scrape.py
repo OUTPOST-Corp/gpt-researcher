@@ -69,7 +69,7 @@ async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
         await websocket.send_json(
             {
                 "type": "logs",
-                "output": f"📝 Information gathered from url {url}: {summary_text}",
+                "output": f"📝 URLから収集した情報 {url}: {summary_text}",
             }
         )
 
@@ -78,7 +78,7 @@ async def async_browse(url: str, question: str, websocket: WebSocket) -> str:
         print(f"An error occurred while processing the url {url}: {e}")
         return f"Error processing the url {url}: {e}"
 
-
+# Seleniumを使用してスクレイピングする関数
 def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
     """Seleniumを使用してウェブサイトからテキストをスクレイピングします。
     Args:
@@ -88,7 +88,7 @@ def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
     """
 
     if not url:
-        return "URLが指定されていないため、ウェブサイト閲覧のリクエストをキャンセルした。", None
+        return "URLが指定されていないため、ウェブサイト閲覧のリクエストをキャンセルしました。", None
 
     driver, text = scrape_text_with_selenium(url)
     add_header(driver)
@@ -107,13 +107,13 @@ def browse_website(url: str, question: str) -> tuple[str, WebDriver]:
 
 
 def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
-    """Scrape text from a website using selenium
+    """seleniumを使ってウェブサイトからテキストをスクレイピングする
 
-    Args:
-        url (str): The url of the website to scrape
+    引数
+        url (str): スクレイピングするウェブサイトの url
 
-    Returns:
-        Tuple[WebDriver, str]: The webdriver and the text scraped from the website
+    戻り値
+        Tuple[WebDriver, str]: ウェブドライバとウェブサイトからスクレイピングされたテキスト
     """
     logging.getLogger("selenium").setLevel(logging.CRITICAL)
 
@@ -175,13 +175,13 @@ def scrape_text_with_selenium(url: str) -> tuple[WebDriver, str]:
 
 
 def get_text(soup):
-    """Get the text from the soup
+    """スープからテキストを取得する
 
-    Args:
-        soup (BeautifulSoup): The soup to get the text from
+    引数
+        スープ(BeautifulSoup): テキストを取得するスープ
 
-    Returns:
-        str: The text from the soup
+    戻り値
+        str: スープからのテキスト
     """
     text = ""
     tags = ["h1", "h2", "h3", "h4", "h5", "p"]
@@ -191,13 +191,13 @@ def get_text(soup):
 
 
 def scrape_links_with_selenium(driver: WebDriver, url: str) -> list[str]:
-    """Scrape links from a website using selenium
+    """セレニウムを使ってウェブサイトからリンクをスクレイピングする
 
-    Args:
-        driver (WebDriver): The webdriver to use to scrape the links
+    引数
+        driver (WebDriver): リンクをスクレイピングするために使用するウェブドライバ
 
-    Returns:
-        List[str]: The links scraped from the website
+    戻り値
+        リスト[str]: ウェブサイトからスクレイピングされたリンク
     """
     page_source = driver.page_source
     soup = BeautifulSoup(page_source, "html.parser")
@@ -211,25 +211,25 @@ def scrape_links_with_selenium(driver: WebDriver, url: str) -> list[str]:
 
 
 def close_browser(driver: WebDriver) -> None:
-    """Close the browser
+    """ブラウザを閉じる
 
-    Args:
-        driver (WebDriver): The webdriver to close
+    引数
+        driver (WebDriver): ウェブドライバを閉じる
 
-    Returns:
-        None
+    戻り値
+        なし
     """
     driver.quit()
 
 
 def add_header(driver: WebDriver) -> None:
-    """Add a header to the website
+    """ウェブサイトにヘッダーを追加する
 
-    Args:
-        driver (WebDriver): The webdriver to use to add the header
+    引数
+        driver (WebDriver): ヘッダーを追加するために使用するウェブドライバー
 
-    Returns:
-        None
+    戻り値
+        なし
     """
     driver.execute_script(open(f"{FILE_DIR}/js/overlay.js", "r").read())
 
